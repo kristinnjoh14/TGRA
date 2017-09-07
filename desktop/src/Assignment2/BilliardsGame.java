@@ -30,12 +30,13 @@ public class BilliardsGame extends ApplicationAdapter {
 	private int colorLoc;
 	
 	////////////////////////
-	
+	//private int size = 64;
 	private Point2D[] balls = new Point2D[15];
 	private Point2D whiteBall;
 	private Point2D[] gameBoard = new Point2D[2];
 	private Point2D[] wholeTable = new Point2D[2];
 	private Point2D[] woodenTable = new Point2D[2];
+	private Point2D[] holes = new Point2D[6];
 	
 	@Override
 	public void create() {
@@ -122,10 +123,9 @@ public class BilliardsGame extends ApplicationAdapter {
 		wholeTable[0] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() - 15*Gdx.graphics.getHeight()/64), (0 + 3*Gdx.graphics.getHeight()/64));
 		wholeTable[1] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 15*Gdx.graphics.getHeight()/64), Gdx.graphics.getHeight() - 3*Gdx.graphics.getHeight()/64);
 		//Create billiard table of size 3/4 display height * 3/8 display height
-		//float height = Gdx.graphics.getHeight();
 		gameBoard[0] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() - 7*Gdx.graphics.getHeight()/32), (0 + Gdx.graphics.getHeight()/16));
 		gameBoard[1] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 7*Gdx.graphics.getHeight()/32), Gdx.graphics.getHeight() - Gdx.graphics.getHeight()/16);
-
+		//holes[0] = 
 	}
 	public void update() {
 		
