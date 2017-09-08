@@ -4,6 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -28,6 +30,8 @@ public class BilliardsGame extends ApplicationAdapter {
 	private int projectionMatrixLoc;
 
 	private int colorLoc;
+	
+	private ShapeRenderer sr;
 	
 	////////////////////////
 	//private int size = 64;
@@ -112,6 +116,8 @@ public class BilliardsGame extends ApplicationAdapter {
 		vertexBuffer.put(array);
 		vertexBuffer.rewind();
 		
+		sr = new ShapeRenderer();
+		
 		setup();
 	}
 
@@ -125,8 +131,15 @@ public class BilliardsGame extends ApplicationAdapter {
 		//Create billiard table of size 3/4 display height * 3/8 display height
 		gameBoard[0] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() - 7*Gdx.graphics.getHeight()/32), (0 + Gdx.graphics.getHeight()/16));
 		gameBoard[1] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 7*Gdx.graphics.getHeight()/32), Gdx.graphics.getHeight() - Gdx.graphics.getHeight()/16);
-		//holes[0] = 
+		//Create the holes at the corners and the middle of the long edges
+		holes[0] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() - 15*Gdx.graphics.getHeight()/64), (0 + 3*Gdx.graphics.getHeight()/64));
+		holes[1] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() - 15*Gdx.graphics.getHeight()/64), Gdx.graphics.getHeight()/2);
+		holes[2] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 15*Gdx.graphics.getHeight()/64), (Gdx.graphics.getHeight()/2));
+		holes[3] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() - 15*Gdx.graphics.getHeight()/64), Gdx.graphics.getHeight() - 3*Gdx.graphics.getHeight()/64);
+		holes[4] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 15*Gdx.graphics.getHeight()/64), (0 + 3*Gdx.graphics.getHeight()/64));
+		holes[5] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 15*Gdx.graphics.getHeight()/64), Gdx.graphics.getHeight() - 3*Gdx.graphics.getHeight()/64);
 	}
+	
 	public void update() {
 		
 	}
@@ -168,6 +181,15 @@ public class BilliardsGame extends ApplicationAdapter {
 				Gdx.gl.glVertexAttribPointer(positionLoc, 2, GL20.GL_FLOAT, false, 0, vertexBuffer);
 				Gdx.gl.glUniform4f(colorLoc, 0.3f, 0.75f, 0.1f, 0.5f);
 				Gdx.gl.glDrawArrays(GL20.GL_TRIANGLE_STRIP, 0, 4);
+				
+				for(int i = 0; i < holes.length; i++) {
+					ShapeRenderer sr = new ShapeRenderer();
+					sr.begin(ShapeType.Filled);
+					sr.setColor(0.0f, 0.0f, 0.0f, 0.0f);
+					sr.circle((float)holes[i].getX(), (float)holes[i].getY(), 10.0f);
+					sr.end();
+				}
+				
 	}
 	
 	public void display() {
@@ -175,6 +197,9 @@ public class BilliardsGame extends ApplicationAdapter {
 	}
 	
 	public void render() {
+		//Gdx.gl.glClearColor(0.2f, 0.2f,0.7f, 0.5f);
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
 		update();
 		display();
 	}
