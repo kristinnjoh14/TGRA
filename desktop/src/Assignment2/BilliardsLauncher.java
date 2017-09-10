@@ -8,8 +8,8 @@ public class BilliardsLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
 		config.title = "Billiards"; // or whatever you like
-		config.width = 800;  //experiment with
-		config.height = 600;  //the window size
+		config.width = 1200;  //experiment with
+		config.height = 900;  //the window size
 		
 		new LwjglApplication(new BilliardsGame(), config);
 	}
