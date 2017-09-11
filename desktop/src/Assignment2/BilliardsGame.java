@@ -4,8 +4,9 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -33,8 +34,8 @@ public class BilliardsGame extends ApplicationAdapter {
 	private int colorLoc;
 	
 	////////////////////////
+	
 	private float ballRadius;
-	//TODO: Move pyramid up to the correct place
 	private Point2D startOfBallPyramid;
 	private Point2D[] balls = new Point2D[15];
 	private int[] ballColors = new int[15];
@@ -43,6 +44,10 @@ public class BilliardsGame extends ApplicationAdapter {
 	private Point2D[] wholeTable = new Point2D[2];
 	private Point2D[] woodenTable = new Point2D[2];
 	private Point2D[] holes = new Point2D[6];
+	
+	//private SpriteBatch batch = new SpriteBatch();
+	//private Texture txt = new Texture ("magic_staff-256.png");
+	//private Sprite cue = new Sprite(txt);
 	
 	@Override
 	public void create() {
@@ -121,7 +126,7 @@ public class BilliardsGame extends ApplicationAdapter {
 		setupTable();
 		setupBalls();
 	}
-
+	
 	public void setupTable() {
 
 		//Create larger table
@@ -181,36 +186,36 @@ public class BilliardsGame extends ApplicationAdapter {
 		for(int i = 1; i < 4; i++) {
 			int ran = rand.nextInt(2);
 			if(ran == 1 && reds > 0) {
-				ballColors[i] = ran;
+				ballColors[i] = 1;
 				reds--;
-			} else {
+			} else if(blues > 0){
 				ballColors[i] = 0;
 				blues--;
-			}
+			} else { ballColors[i] = 1; }
 		}
 		for(int i = 5; i < 10; i++) {
 			int ran = rand.nextInt(2);
 			if(ran == 1 && reds > 0) {
-				ballColors[i] = ran;
+				ballColors[i] = 1;
 				reds--;
-			} else {
+			} else if(blues > 0){
 				ballColors[i] = 0;
 				blues--;
-			}
+			} else { ballColors[i] = 1; }
 		}
 		for(int i = 11; i < 14; i++) {
 			int ran = rand.nextInt(2);
 			if(ran == 1 && reds > 0) {
-				ballColors[i] = ran;
+				ballColors[i] = 1;
 				reds--;
-			} else {
+			} else if(blues > 0){
 				ballColors[i] = 0;
 				blues--;
-			}
+			} else { ballColors[i] = 1; }
 		}
 	}
 	
-	public void drawColor(int color) {
+	public void setColor(int color) {
 		if(color == 1) {
 			Gdx.gl.glUniform4f(colorLoc, 1.0f, 0.0f, 0.0f, 1f);
 		} else if(color == 2) {
@@ -221,7 +226,7 @@ public class BilliardsGame extends ApplicationAdapter {
 	}
 	
 	public void drawCircle(Point2D pos, float radius) {
-		int vertexNumber = 60;
+		int vertexNumber = 30;
 		int sideCount = vertexNumber - 2;
 		double twoPi = 2*Math.PI;
 		float x = (float)pos.getX();
@@ -286,9 +291,9 @@ public class BilliardsGame extends ApplicationAdapter {
 				
 	}
 	
-	public void displayBalls() {		
+	public void displayBalls() {
 		for(int i = 0; i < 15; i++) {
-			drawColor(ballColors[i]);
+			setColor(ballColors[i]);
 			drawCircle(balls[i], ballRadius);
 		}
 		//White Ball
@@ -297,6 +302,12 @@ public class BilliardsGame extends ApplicationAdapter {
 	}
 	
 	public void update() {
+		int mouseX = Gdx.input.getX();
+		int mouseY = Gdx.input.getY();
+		//cue.setPosition(mouseX, mouseY);
+		//batch.begin();
+		//cue.draw(batch);
+		//batch.end();
 		
 	}
 	
