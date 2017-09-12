@@ -56,6 +56,8 @@ public class BilliardsGame extends ApplicationAdapter {
 	//private Texture txt = new Texture ("magic_staff-256.png");
 	//private Sprite cue = new Sprite(txt);
 	
+	//TODO: set white ball perhaps to balls[0]? thereby moving all balls by 1 and changing all references to whiteBall to balls[0].
+	//Sets various variables and constants
 	@Override
 	public void create() {
 		String vertexShaderString;
@@ -133,7 +135,7 @@ public class BilliardsGame extends ApplicationAdapter {
 		setupTable();
 		setupBalls();
 	}
-	
+	//Sets up the billiards table
 	public void setupTable() {
 
 		//Create larger table
@@ -153,12 +155,15 @@ public class BilliardsGame extends ApplicationAdapter {
 		holes[4] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 15*Gdx.graphics.getHeight()/64), (0 + 3*Gdx.graphics.getHeight()/64));
 		holes[5] = new Point2D.Float((float)(0.5*Gdx.graphics.getWidth() + 15*Gdx.graphics.getHeight()/64), Gdx.graphics.getHeight() - 3*Gdx.graphics.getHeight()/64);
 	}
-	
+	//Sets up the balls
 	public void setupBalls() {
+		//Set the size of all balls
 		ballRadius = (float) 7/500*Gdx.graphics.getHeight();
 		
 		double sixtyDegrees = Math.PI/3;
+		//Set the spawn point the upper-left ball of the pyramid, which spawns relative to itself.
 		startOfBallPyramid = new Point2D.Float((float)(Gdx.graphics.getWidth()/2 - 4*ballRadius), Gdx.graphics.getHeight()/2 + 7*Gdx.graphics.getHeight()/32 + 8*ballRadius);
+		//Set the spawn point of the white ball
 		whiteBall = new Point2D.Float((float) Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 - 7*Gdx.graphics.getHeight()/32);
 		//TODO: refactor into a clever loop
 		balls[0] = new Point2D.Float((float) startOfBallPyramid.getX(), (float) startOfBallPyramid.getY());
@@ -181,12 +186,13 @@ public class BilliardsGame extends ApplicationAdapter {
 		balls[14] = new Point2D.Float((float) balls[12].getX()+ballRadius, (float) (balls[12].getY()-2*Math.sin(sixtyDegrees)*ballRadius));
 		assignBalls();
 		
+		//TODO: set whiteMovement to <0,0>
 		whiteMovement = new Vector2(0,200);
 		for(int i = 0; i < 15; i++) {
 			ballMovements[i] = new Vector2(0,0);
 		}
 	}
-	
+	//Assigns colors to the balls
 	public void assignBalls() {
 		Random rand = new Random();
 		ballColors[0] = rand.nextInt(2);
@@ -226,7 +232,7 @@ public class BilliardsGame extends ApplicationAdapter {
 			} else { ballColors[i] = 1; }
 		}
 	}
-	
+	//Sets the color to be drawn, perhaps poor style?
 	public void setColor(int color) {
 		if(color == 1) {
 			Gdx.gl.glUniform4f(colorLoc, 1.0f, 0.0f, 0.0f, 1f);
@@ -236,7 +242,7 @@ public class BilliardsGame extends ApplicationAdapter {
 			Gdx.gl.glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1f);
 		}
 	}
-	
+	//Draws a filled circle of the currently selected color with radius radius at pos
 	public void drawCircle(Point2D pos, float radius) {
 		int vertexNumber = 30;
 		int sideCount = vertexNumber - 2;
@@ -257,9 +263,9 @@ public class BilliardsGame extends ApplicationAdapter {
 		}
 		Gdx.gl.glDrawArrays(GL20.GL_TRIANGLE_FAN, 0, vertexNumber);
  	}
-
+	//Draws the table
 	public void displayTable() {
-		//display table edges
+				//display the wood part of the table
 				vertexBuffer.put(0, (float)woodenTable[0].getX()); //x coordinate 1
 				vertexBuffer.put(1, (float)woodenTable[0].getY()); //y coordinate 1
 				vertexBuffer.put(2, (float)woodenTable[0].getX()); //x coordinate 2
@@ -295,6 +301,7 @@ public class BilliardsGame extends ApplicationAdapter {
 				Gdx.gl.glVertexAttribPointer(positionLoc, 2, GL20.GL_FLOAT, false, 0, vertexBuffer);
 				Gdx.gl.glUniform4f(colorLoc, 0.3f, 0.75f, 0.1f, 0.5f);
 				Gdx.gl.glDrawArrays(GL20.GL_TRIANGLE_STRIP, 0, 4);
+				//display holes
 				Gdx.gl.glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 1f);
 				for(int i = 0; i < holes.length; i++) {
 					drawCircle(holes[i], (float)(ballRadius*1.1));
@@ -302,8 +309,9 @@ public class BilliardsGame extends ApplicationAdapter {
 				
 				
 	}
-	
+	//Draws the balls
 	public void displayBalls() {
+		//display all balls but the white one
 		for(int i = 0; i < 15; i++) {
 			setColor(ballColors[i]);
 			drawCircle(balls[i], ballRadius);
@@ -315,6 +323,7 @@ public class BilliardsGame extends ApplicationAdapter {
 	
 	///////////////////
 	
+	//Moves balls
 	public void moveBalls() {
 		float delta = Gdx.graphics.getDeltaTime();
 		whiteBall = new Point2D.Float((float) (whiteBall.getX() + whiteMovement.x*delta), (float) (whiteBall.getY() + whiteMovement.y*delta));
@@ -336,18 +345,18 @@ public class BilliardsGame extends ApplicationAdapter {
 				ballMovements[i].set(0, 0);
 		}
 	}
-	
+	//Game logic happens here
 	public void update() {
 		int mouseX = Gdx.input.getX();
 		int mouseY = Gdx.input.getY();
 		moveBalls();
 	}
-	
+	//Drawing the game happens here
 	public void display() {
 		displayTable();
 		displayBalls();
 	}
-	
+	//Everything happens here
 	public void render() {
 		update();
 		display();
