@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -44,6 +46,11 @@ public class BilliardsGame extends ApplicationAdapter {
 	private Point2D[] wholeTable = new Point2D[2];
 	private Point2D[] woodenTable = new Point2D[2];
 	private Point2D[] holes = new Point2D[6];
+	
+	private Vector2[] ballMovements = new Vector2[15];
+	private Vector2 whiteMovement;
+	private float kFriction = 0.4f;
+	private int sFriction = 5;
 	
 	//private SpriteBatch batch = new SpriteBatch();
 	//private Texture txt = new Texture ("magic_staff-256.png");
@@ -173,6 +180,11 @@ public class BilliardsGame extends ApplicationAdapter {
 		balls[13] = new Point2D.Float((float) balls[12].getX()+2*ballRadius,(float)  balls[12].getY());
 		balls[14] = new Point2D.Float((float) balls[12].getX()+ballRadius, (float) (balls[12].getY()-2*Math.sin(sixtyDegrees)*ballRadius));
 		assignBalls();
+		
+		whiteMovement = new Vector2(0,200);
+		for(int i = 0; i < 15; i++) {
+			ballMovements[i] = new Vector2(0,0);
+		}
 	}
 	
 	public void assignBalls() {
@@ -301,14 +313,34 @@ public class BilliardsGame extends ApplicationAdapter {
 		drawCircle(whiteBall, ballRadius);
 	}
 	
+	///////////////////
+	
+	public void moveBalls() {
+		float delta = Gdx.graphics.getDeltaTime();
+		whiteBall = new Point2D.Float((float) (whiteBall.getX() + whiteMovement.x*delta), (float) (whiteBall.getY() + whiteMovement.y*delta));
+		Vector2 v = new Vector2(-whiteMovement.x,-whiteMovement.y);
+		if(whiteMovement.len() > sFriction) {
+			v.scl(kFriction*delta);
+			whiteMovement.add(v);
+		}
+		else
+			whiteMovement.set(0, 0);
+		for(int i = 0; i < 15; i++) {
+			balls[i] = new Point2D.Float((float) (balls[i].getX() + ballMovements[i].x*delta),(float) balls[i].getY() + ballMovements[i].y*delta);
+			Vector2 g = new Vector2(-ballMovements[i].x, -ballMovements[i].y);
+			if(ballMovements[i].len() > sFriction) {
+				g.scl(kFriction*delta);
+				ballMovements[i].add(g);
+			}
+			else
+				ballMovements[i].set(0, 0);
+		}
+	}
+	
 	public void update() {
 		int mouseX = Gdx.input.getX();
 		int mouseY = Gdx.input.getY();
-		//cue.setPosition(mouseX, mouseY);
-		//batch.begin();
-		//cue.draw(batch);
-		//batch.end();
-		
+		moveBalls();
 	}
 	
 	public void display() {
