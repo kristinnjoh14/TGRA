@@ -355,15 +355,22 @@ public class BilliardsGame extends ApplicationAdapter {
 		//and get the vector perpendicular to it, called tangent as it is tangential to the surfaces colliding
 		Vector2 tanNorm = new Vector2(-norm.y, norm.x);
 		//copy ball velocity vectors to use in computation of normal and tangential projections
-		Vector2 aNorm = ballMovements[a].cpy();
-		Vector2 aTanNorm = ballMovements[a].cpy();
-		aNorm.dot(norm);
-		aTanNorm.dot(tanNorm);
-		Vector2 bNorm = ballMovements[b].cpy();
-		Vector2 bTanNorm = ballMovements[b].cpy();
-		bNorm.dot(norm);
-		bTanNorm.dot(tanNorm);
-		
+		float aNormScl = ballMovements[a].dot(norm);
+		float aTanNormScl = ballMovements[a].dot(tanNorm);
+		float bNormScl = ballMovements[b].dot(norm);
+		float bTanNormScl = ballMovements[b].dot(tanNorm);
+		Vector2 aFinal = norm.cpy();
+		aFinal.scl(aNormScl);
+		Vector2 aTanNorm = tanNorm.cpy();
+		aTanNorm.scl(aTanNormScl);
+		aFinal.add(aTanNorm);
+		Vector2 bFinal = norm.cpy();
+		bFinal.scl(bNormScl);
+		Vector2 bTanNorm = tanNorm.cpy();
+		bTanNorm.scl(bTanNormScl);
+		bFinal.add(bTanNorm);
+		ballMovements[a].set(aFinal);
+		ballMovements[b].set(bFinal);
 	}
 	//Game logic happens here
 	public void update() {
