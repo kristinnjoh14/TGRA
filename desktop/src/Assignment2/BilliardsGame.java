@@ -47,7 +47,7 @@ public class BilliardsGame extends ApplicationAdapter {
 	private Point2D[] holes = new Point2D[6];
 	
 	private Vector2[] ballMovements = new Vector2[16];
-	private float kFriction = 0.4f;
+	private float kFriction = 0.35f;
 	private int sFriction = 7;
 	
 	//private SpriteBatch batch = new SpriteBatch();
@@ -335,7 +335,34 @@ public class BilliardsGame extends ApplicationAdapter {
 		}
 	}
 	//Checks to see if any balls have collided
+	//TODO: add walls
 	public void collisionCheck() {
+		for(int i = 0; i < 16; i++) {
+			for(int j = i + 1; j < 16; j++) {
+				double dist = balls[i].distance(balls[j]);
+				if(dist <= 2*ballRadius) {
+					collideBalls(i, j);
+				}
+			}
+		}
+	}
+	//Collides and bounces balls a and b
+	public void collideBalls(int a, int b) {
+		//Create a vector between the centers of the balls, called normal as it is perpendicular to the surfaces that are colliding
+		Vector2 norm = new Vector2((float) (balls[a].getX() - balls[b].getX()), (float) (balls[a].getY() - balls[b].getY()));
+		//normalize it, making it a unit vector with the same direction
+		norm.setLength2(1);
+		//and get the vector perpendicular to it, called tangent as it is tangential to the surfaces colliding
+		Vector2 tanNorm = new Vector2(-norm.y, norm.x);
+		//copy ball velocity vectors to use in computation of normal and tangential projections
+		Vector2 aNorm = ballMovements[a].cpy();
+		Vector2 aTanNorm = ballMovements[a].cpy();
+		aNorm.dot(norm);
+		aTanNorm.dot(tanNorm);
+		Vector2 bNorm = ballMovements[b].cpy();
+		Vector2 bTanNorm = ballMovements[b].cpy();
+		bNorm.dot(norm);
+		bTanNorm.dot(tanNorm);
 		
 	}
 	//Game logic happens here
@@ -343,6 +370,7 @@ public class BilliardsGame extends ApplicationAdapter {
 		int mouseX = Gdx.input.getX();
 		int mouseY = Gdx.input.getY();
 		moveBalls();
+		collisionCheck();
 	}
 	//Drawing the game happens here
 	public void display() {
