@@ -184,12 +184,10 @@ public class BilliardsGame extends ApplicationAdapter {
 		balls[15] = new Point2D.Float((float) balls[13].getX()+ballRadius, (float) (balls[13].getY()-2*Math.sin(sixtyDegrees)*ballRadius));
 		assignBalls();
 		
-		//TODO: set whiteMovement to <0,0>
 		ballMovements[0] = new Vector2(0,0);
 		for(int i = 1; i < 16; i++) {
 			ballMovements[i] = new Vector2(0,0);
 		}
-		//ballMovements[15].set(0,-30);
 	}
 	//Assigns colors to the balls
 	public void assignBalls() {
@@ -354,34 +352,24 @@ public class BilliardsGame extends ApplicationAdapter {
 		Vector2 norm = new Vector2((float) (balls[a].getX() - balls[b].getX()), (float) (balls[a].getY() - balls[b].getY()));
 		//copy it and set the length to 2r just so the balls aren't inside each other but precisely colliding
 		Vector2 norm2r = norm.cpy().setLength(2*ballRadius);
-		//balls[a] = new Point2D.Float((float) balls[b].getX() + norm2r.x,(float) balls[b].getY() + norm2r.y);
+		balls[a] = new Point2D.Float((float) balls[b].getX() + norm2r.x,(float) balls[b].getY() + norm2r.y);
 		//normalize it, making it a unit vector with the same direction
 		norm.setLength2(1);
-		//and get the vector perpendicular to it, called tangent as it is tangential to the surfaces colliding
-		Vector2 tanNorm = new Vector2(-norm.y, norm.x);
-		//copy ball velocity vectors to use in computation of normal and tangential projections
+		//compute normal projections
 		//then, multiply those by the normals, and the results again by the normals. Add all of those up and return
 		float aNormScl = ballMovements[a].dot(norm);
-		float aTanNormScl = ballMovements[a].dot(tanNorm);
+		float normDot = norm.dot(norm);
 		float bNormScl = ballMovements[b].dot(norm);
-		float bTanNormScl = ballMovements[b].dot(tanNorm);
-		if(aNormScl != 0)
-			System.out.println(aNormScl);
-		Vector2 aFinal = norm.cpy();
-		aFinal.scl(aNormScl);
-		aFinal.set(aFinal.x*norm.x, aFinal.y*norm.y);
-		Vector2 aTanNorm = tanNorm.cpy();
-		aTanNorm.scl(aTanNormScl);
-		aTanNorm.set(aTanNorm.x*tanNorm.x, aTanNorm.y*tanNorm.y);
-		aFinal.add(aTanNorm);
-		Vector2 bFinal = norm.cpy();
-		bFinal.scl(bNormScl);
-		bFinal.set(bFinal.x*norm.x, bFinal.y*norm.y);
-		Vector2 bTanNorm = tanNorm.cpy();
-		bTanNorm.scl(bTanNormScl);
-		bTanNorm.set(bTanNorm.x*tanNorm.x, bTanNorm.y*tanNorm.y);
-		ballMovements[a].set(aFinal);
-		ballMovements[b].set(bFinal);
+		aNormScl = aNormScl / normDot;
+		bNormScl = bNormScl / normDot;
+		Vector2 aMid = norm.cpy();
+		aMid.scl(aNormScl);
+		Vector2 bMid = norm.cpy();
+		bMid.scl(bNormScl);
+		Vector2 aFinal = aMid.sub(bMid);
+		aFinal.setLength(aFinal.len());
+		ballMovements[a].sub(aFinal);
+		ballMovements[b].add(aFinal);
 	}
 	//Game logic happens here
 	public void update() {
