@@ -46,6 +46,7 @@ public class BilliardsGame extends ApplicationAdapter {
 	private Point2D[] woodenTable = new Point2D[2];
 	private Point2D[] holes = new Point2D[6];
 	
+	private float shotPowerMult = 2.2f;
 	private Vector2[] ballMovements = new Vector2[16];
 	private float kFriction = 0.35f;
 	private int sFriction = 7;
@@ -184,10 +185,11 @@ public class BilliardsGame extends ApplicationAdapter {
 		assignBalls();
 		
 		//TODO: set whiteMovement to <0,0>
-		ballMovements[0] = new Vector2(0,200);
+		ballMovements[0] = new Vector2(0,0);
 		for(int i = 1; i < 16; i++) {
 			ballMovements[i] = new Vector2(0,0);
 		}
+		//ballMovements[15].set(0,-30);
 	}
 	//Assigns colors to the balls
 	public void assignBalls() {
@@ -340,7 +342,7 @@ public class BilliardsGame extends ApplicationAdapter {
 		for(int i = 0; i < 16; i++) {
 			for(int j = i + 1; j < 16; j++) {
 				double dist = balls[i].distance(balls[j]);
-				if(dist <= 2*ballRadius) {
+				if(dist < 2*ballRadius) {
 					collideBalls(i, j);
 				}
 			}
@@ -350,25 +352,34 @@ public class BilliardsGame extends ApplicationAdapter {
 	public void collideBalls(int a, int b) {
 		//Create a vector between the centers of the balls, called normal as it is perpendicular to the surfaces that are colliding
 		Vector2 norm = new Vector2((float) (balls[a].getX() - balls[b].getX()), (float) (balls[a].getY() - balls[b].getY()));
+		//copy it and set the length to 2r just so the balls aren't inside each other but precisely colliding
+		Vector2 norm2r = norm.cpy().setLength(2*ballRadius);
+		//balls[a] = new Point2D.Float((float) balls[b].getX() + norm2r.x,(float) balls[b].getY() + norm2r.y);
 		//normalize it, making it a unit vector with the same direction
 		norm.setLength2(1);
 		//and get the vector perpendicular to it, called tangent as it is tangential to the surfaces colliding
 		Vector2 tanNorm = new Vector2(-norm.y, norm.x);
 		//copy ball velocity vectors to use in computation of normal and tangential projections
+		//then, multiply those by the normals, and the results again by the normals. Add all of those up and return
 		float aNormScl = ballMovements[a].dot(norm);
 		float aTanNormScl = ballMovements[a].dot(tanNorm);
 		float bNormScl = ballMovements[b].dot(norm);
 		float bTanNormScl = ballMovements[b].dot(tanNorm);
+		if(aNormScl != 0)
+			System.out.println(aNormScl);
 		Vector2 aFinal = norm.cpy();
 		aFinal.scl(aNormScl);
+		aFinal.set(aFinal.x*norm.x, aFinal.y*norm.y);
 		Vector2 aTanNorm = tanNorm.cpy();
 		aTanNorm.scl(aTanNormScl);
+		aTanNorm.set(aTanNorm.x*tanNorm.x, aTanNorm.y*tanNorm.y);
 		aFinal.add(aTanNorm);
 		Vector2 bFinal = norm.cpy();
 		bFinal.scl(bNormScl);
+		bFinal.set(bFinal.x*norm.x, bFinal.y*norm.y);
 		Vector2 bTanNorm = tanNorm.cpy();
 		bTanNorm.scl(bTanNormScl);
-		bFinal.add(bTanNorm);
+		bTanNorm.set(bTanNorm.x*tanNorm.x, bTanNorm.y*tanNorm.y);
 		ballMovements[a].set(aFinal);
 		ballMovements[b].set(bFinal);
 	}
@@ -378,6 +389,9 @@ public class BilliardsGame extends ApplicationAdapter {
 		int mouseY = Gdx.input.getY();
 		moveBalls();
 		collisionCheck();
+		if(Gdx.input.justTouched()) {
+			ballMovements[0].set((float) (mouseX - balls[0].getX()), (float) (Gdx.graphics.getHeight() - mouseY - balls[0].getY())).scl(shotPowerMult);
+		}
 	}
 	//Drawing the game happens here
 	public void display() {
